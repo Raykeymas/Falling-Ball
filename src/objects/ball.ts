@@ -1,4 +1,4 @@
-type Position = {
+export type Position = {
     x: number,
     y: number,
 }
@@ -38,7 +38,6 @@ export class Ball {
 
     draw() {
         if (this.context) {
-            this.context?.clearRect(0,0, this.context.canvas.width, this.context.canvas.height);
             this.context?.save();
             this.context?.translate(this.position.x + this.width - this.width/3 ,this.position.y + this.height/3);
             this.context?.rotate(this.translate * Math.PI / 180);
@@ -83,8 +82,8 @@ export class Ball {
     }
 
     isClicked(point: Position) {
-        return (this.position.x <= point.x && point.x <= this.position.x + this.width) &&
-        (this.position.y <= point.y && point.y <= this.position.y + this.height);
+        return ((this.position.x - this.width / 2) <= point.x && point.x <= this.position.x + this.width * 1.5) &&
+        ((this.position.y - this.height / 2 ) <= point.y && point.y <= this.position.y + this.height*1.5);
     }
 
     changeColor() {
@@ -96,13 +95,15 @@ export class Ball {
     }
 
     repulsiveX() {
-        this.vx = this.repulsion*10;
+        if (Math.random() > 0.5) {
+            this.vx = this.repulsion*(1 + Math.floor(Math.random() * 15));
+        } else {
+            this.vx = -this.repulsion*(1 + Math.floor(Math.random() * 15));
+        }
     }
 
     repulsiveY() {
         this.vy = -this.repulsion*30;
-    } 
-
-
+    }
 
 }

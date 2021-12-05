@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useWindowDimentions } from "../hooks/windowDimentions";
+import { BackGround } from "../objects/background";
 import { Ball } from "../objects/ball";
 
 const CanvasBox = styled.div`
@@ -11,12 +12,16 @@ const CanvasBox = styled.div`
 const AppCanvas = () => {
 
     const ball = new Ball(0,0,100,"black", 0.4);
+    const background = new BackGround();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const {width, height} = useWindowDimentions();
 
     const loop = () => {
+        context?.clearRect(0,0, context.canvas.width, context.canvas.height);
+        background.draw();
         ball.draw();
+        background.spread();
         ball.fall();
         ball.rotate();
         window.requestAnimationFrame(loop);
@@ -34,6 +39,7 @@ const AppCanvas = () => {
         if (context) {
             // Windowがリサイズした時毎回処理が走るのを止める
             ball.setContext(context);
+            background.setContext(context);
             canvasRef.current?.addEventListener("click", (event) => {
                 const rect = canvasRef.current?.getBoundingClientRect();
                 if (rect) {
@@ -43,6 +49,7 @@ const AppCanvas = () => {
                     };
                     if (ball.isClicked(clickPoint)) {
                         ball.clicked();
+                        background.start(ball.position, ball.width, ball.height, ball.color, ball.translate);
                     }
                 }
             });
