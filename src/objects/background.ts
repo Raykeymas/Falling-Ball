@@ -1,3 +1,4 @@
+import AppGetColor from "../utils/color";
 import { Ball, Position } from "./ball";
 
 export class BackGround extends Ball {
@@ -40,13 +41,7 @@ export class BackGround extends Ball {
         if (this.color.length != 0) {
             this.previousColor = this.color;
         }
-        if (this.color == "blue") {
-            this.color = "red";
-        } else if (this.color == "red") {
-            this.color = "pink";
-        } else {
-            this.color = "blue";
-        }
+        this.color = AppGetColor(color);
     }
 
     spread() {

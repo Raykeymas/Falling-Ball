@@ -1,3 +1,5 @@
+import AppGetColor from "../utils/color";
+
 export type Position = {
     x: number,
     y: number,
@@ -87,11 +89,8 @@ export class Ball {
     }
 
     changeColor() {
-        if (this.color == "black") {
-            this.color = "red";
-        } else {
-            this.color = "black";
-        }
+        const color = AppGetColor(this.color);
+        this.color = color;
     }
 
     repulsiveX() {
