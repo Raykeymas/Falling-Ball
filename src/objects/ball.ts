@@ -18,7 +18,10 @@ export class Ball {
     context: CanvasRenderingContext2D | null | undefined;
     repulsion: number = 0.6;
 
-    constructor(x: number, y: number, width: number, color: string, gy: number) {
+    isSmall: Boolean;
+    smallBalls: Ball[];
+
+    constructor(x: number, y: number, width: number, color: string, gy: number, isSmall: Boolean = false) {
         this.position = {
             x: x,
             y: y,
@@ -30,6 +33,8 @@ export class Ball {
         this.height = width;
         this.color = color;
         this.context = undefined;
+        this.smallBalls = [];
+        this.isSmall = isSmall;
     }
 
     setContext(context: CanvasRenderingContext2D) {
@@ -40,12 +45,20 @@ export class Ball {
 
     draw() {
         if (this.context) {
-            this.context?.save();
-            this.context?.translate(this.position.x + this.width - this.width/3 ,this.position.y + this.height/3);
-            this.context?.rotate(this.translate * Math.PI / 180);
-            this.context.fillStyle = this.color;
-            this.context.fillRect(-this.width/2, -this.height/2,this.width, this.height);
-            this.context.restore();
+            if (this.smallBalls.length != 0) {
+                this.smallBalls.forEach((ball) => {
+                    ball.fall();
+                    ball.rotate();
+                    ball.draw();
+                })
+            } else {
+                this.context?.save();
+                this.context?.translate(this.position.x + this.width - this.width / 3, this.position.y + this.height / 3);
+                this.context?.rotate(this.translate * Math.PI / 180);
+                this.context.fillStyle = this.color;
+                this.context.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+                this.context.restore();
+            }
         }
     }
 
@@ -53,9 +66,12 @@ export class Ball {
         if (this.context != null) {
             this.vy += this.gy;
             this.position.y = this.position.y + this.vy;
-            if (this.context?.canvas.height < this.position.y + this.height) {
-                this.vy *= -this.repulsion;
-                this.position.y = this.context?.canvas.height - this.height; 
+            if (this.context?.canvas.height < this.position.y) {
+                // this.vy *= -this.repulsion;
+                // this.position.y = this.context?.canvas.height - this.height; 
+                if (this.smallBalls.length == 0 && !this.isSmall) {
+                    this.explosion();
+                }
             }
 
             this.position.x = this.position.x + this.vx;
@@ -69,6 +85,17 @@ export class Ball {
         }
     }
 
+    explosion() {
+        for (var i = 0; i < 200; i++) {
+            var ball = new Ball(this.position.x, this.position.y, this.width / 10, AppGetColor(this.color), 0.4, true);
+            if (this.context != null) {
+                ball.setContext(this.context);
+                ball.clicked();
+            }
+            this.smallBalls.push(ball);
+        }
+    }
+    
     rotate() {
         if (this.translate == 360) {
             this.translate = 0;
@@ -85,7 +112,7 @@ export class Ball {
 
     isClicked(point: Position) {
         return ((this.position.x - this.width / 2) <= point.x && point.x <= this.position.x + this.width * 1.5) &&
-        ((this.position.y - this.height / 2 ) <= point.y && point.y <= this.position.y + this.height*1.5);
+            ((this.position.y - this.height / 2) <= point.y && point.y <= this.position.y + this.height * 1.5);
     }
 
     changeColor() {
@@ -95,14 +122,14 @@ export class Ball {
 
     repulsiveX() {
         if (Math.random() > 0.5) {
-            this.vx = this.repulsion*(1 + Math.floor(Math.random() * 15));
+            this.vx = this.repulsion * (1 + Math.floor(Math.random() * 20));
         } else {
-            this.vx = -this.repulsion*(1 + Math.floor(Math.random() * 15));
+            this.vx = -this.repulsion * (1 + Math.floor(Math.random() * 20));
         }
     }
 
     repulsiveY() {
-        this.vy = -this.repulsion*30;
+        this.vy = -this.repulsion * (15 + Math.floor(Math.random() * 20));
     }
 
 }
