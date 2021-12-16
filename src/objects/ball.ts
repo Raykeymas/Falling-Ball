@@ -20,6 +20,7 @@ export class Ball {
 
     isSmall: Boolean;
     smallBalls: Ball[];
+    smallBallsLength: number = 200;
 
     constructor(x: number, y: number, width: number, color: string, gy: number, isSmall: Boolean = false) {
         this.position = {
@@ -66,7 +67,7 @@ export class Ball {
         if (this.context != null) {
             this.vy += this.gy;
             this.position.y = this.position.y + this.vy;
-            if (this.context?.canvas.height < this.position.y) {
+            if (this.context?.canvas.height < this.position.y - this.height) {
                 // this.vy *= -this.repulsion;
                 // this.position.y = this.context?.canvas.height - this.height; 
                 if (this.smallBalls.length == 0 && !this.isSmall) {
@@ -86,7 +87,7 @@ export class Ball {
     }
 
     explosion() {
-        for (var i = 0; i < 200; i++) {
+        for (var i = 0; i < this.smallBallsLength; i++) {
             var ball = new Ball(this.position.x, this.position.y, this.width / 10, AppGetColor(this.color), 0.4, true);
             if (this.context != null) {
                 ball.setContext(this.context);
@@ -95,7 +96,7 @@ export class Ball {
             this.smallBalls.push(ball);
         }
     }
-    
+
     rotate() {
         if (this.translate == 360) {
             this.translate = 0;
